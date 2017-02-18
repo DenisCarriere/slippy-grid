@@ -2,34 +2,40 @@
   "name": "slippy-grid",
   "version": "0.1.0",
   "description": "Create slippy tile grid iterators from BBox or GeoJSON",
-  "main": "slippy-grid.js",
-  "jsnext:main": "index.js",
+  "main": "dist/slippy-tile.js",
+  "browser": "dist/slippy-tile.browser.js",
+  "module": "dist/slippy-tile.es.js",
+  "jsnext:main": "dist/slippy-tile.es.js",
   "types": "index.d.ts",
   "files": [
     "index.d.ts",
     "index.js",
     "slippy-grid.js",
+    "slippy-grid.js.map",
     "slippy-grid.min.js"
   ],
   "scripts": {
-    "prepublish": "npm run test && npm run build",
-    "test": "npm run lint && jest --coverage",
+    "prepublish": "npm run test && npm run uglify",
+    "test": "npm run lint && npm run build && jest --coverage",
     "lint": "standard",
     "docs": "documentation readme index.js --section=API",
-    "build": "browserify index.js -s slippyGrid > slippy-grid.js && uglifyjs slippy-grid.js -c -m > slippy-grid.min.js"
+    "build": "rollup -c rollup.config.js",
+    "uglify": "uglifyjs slippy-grid.js -c -m -o slippy-grid.min.js"
   },
   "author": "Denis Carriere <carriere.denis@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "global-mercator": "^1.9.2"
+    "global-mercator": "^2.0.2",
+    "leaflet": "^1.0.3"
   },
   "devDependencies": {
-    "browserify": "^14.0.0",
-    "coveralls": "^2.11.15",
+    "coveralls": "^2.11.16",
     "documentation": "^4.0.0-beta.18",
-    "jest-cli": "^18.0.0",
+    "jest-cli": "^18.1.0",
+    "rollup": "^0.41.4",
+    "rollup-plugin-node-resolve": "^2.0.0",
     "standard": "^8.6.0",
-    "typescript": "^2.1.5",
+    "typescript": "^2.1.6",
     "uglify-js": "git://github.com/mishoo/UglifyJS2.git#harmony"
   },
   "keywords": [
@@ -51,6 +57,9 @@
   },
   "testEnvironment": "node",
   "standard": {
-    "env": "jest"
+    "env": "jest",
+    "ignore": [
+      "dist"
+    ]
   }
 }

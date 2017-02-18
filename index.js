@@ -1,6 +1,4 @@
-const lngLatToTile = require('global-mercator').lngLatToTile
-const range = require('global-mercator').range
-const hash = require('global-mercator').hash
+import {lngLatToTile, hash, range} from 'global-mercator'
 
 /**
  * Creates an Iterator of Tiles from a given BBox
@@ -15,8 +13,9 @@ const hash = require('global-mercator').hash
  * //=value
  * //=done
  */
-function * single (extent, minZoom, maxZoom) {
+export function * single (extent, minZoom, maxZoom) {
   const unique = {}
+
   for (const [columns, rows, zoom] of levels(extent, minZoom, maxZoom)) {
     for (const row of rows) {
       for (const column of columns) {
@@ -30,7 +29,6 @@ function * single (extent, minZoom, maxZoom) {
     }
   }
 }
-module.exports.single = single
 
 /**
  * Creates a bulk Iterator of Tiles from a given BBox
@@ -46,7 +44,7 @@ module.exports.single = single
  * //=value
  * //=done
  */
-function * bulk (extent, minZoom, maxZoom, size) {
+export function * bulk (extent, minZoom, maxZoom, size) {
   const iterable = single(extent, minZoom, maxZoom)
   let container = []
   let i = 0
@@ -66,7 +64,6 @@ function * bulk (extent, minZoom, maxZoom, size) {
     }
   }
 }
-module.exports.bulk = bulk
 
 /**
  * Creates a grid level pattern of arrays
@@ -79,7 +76,7 @@ module.exports.bulk = bulk
  * const levels = levels([-180.0, -90.0, 180, 90], 3, 8)
  * //=levels
  */
-function levels (extent, minZoom, maxZoom) {
+export function levels (extent, minZoom, maxZoom) {
   const levels = []
   for (const bbox of (extent[0][0]) ? extent : [extent]) {
     const [x1, y1, x2, y2] = bbox
@@ -97,7 +94,6 @@ function levels (extent, minZoom, maxZoom) {
   }
   return levels
 }
-module.exports.levels = levels
 
 /**
  * Counts the total amount of tiles from a given BBox
@@ -110,11 +106,10 @@ module.exports.levels = levels
  * count([-180.0, -90.0, 180, 90], 3, 8)
  * //=563136
  */
-function count (extent, minZoom, maxZoom) {
+export function count (extent, minZoom, maxZoom) {
   let count = 0
   for (const [columns, rows] of levels(extent, minZoom, maxZoom)) {
     count += rows.length * columns.length
   }
   return count
 }
-module.exports.count = count
