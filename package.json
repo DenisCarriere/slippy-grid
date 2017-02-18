@@ -1,0 +1,55 @@
+{
+  "name": "slippy-grid",
+  "version": "0.1.0",
+  "description": "Create slippy tile grid iterators from BBox or GeoJSON",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "files": [
+    "index.d.ts",
+    "index.js",
+    "slippy-grid.js",
+    "slippy-grid.min.js"
+  ],
+  "scripts": {
+    "prepublish": "npm run test && npm run build",
+    "test": "npm run lint && jest --coverage",
+    "lint": "standard",
+    "docs": "documentation readme index.js --section=API",
+    "build": "browserify index.js -s mercator > slippy-grid.js && uglifyjs slippy-grid.js -c -m > slippy-grid.min.js"
+  },
+  "author": "Denis Carriere <carriere.denis@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "global-mercator": "^1.9.2"
+  },
+  "devDependencies": {
+    "browserify": "^14.0.0",
+    "coveralls": "^2.11.15",
+    "documentation": "^4.0.0-beta.18",
+    "jest-cli": "^18.0.0",
+    "standard": "^8.6.0",
+    "typescript": "^2.1.5",
+    "uglify-js": "git://github.com/mishoo/UglifyJS2.git#harmony"
+  },
+  "keywords": [
+    "gis",
+    "geo",
+    "geojs",
+    "geospatial",
+    "geography",
+    "geometry",
+    "extent",
+    "geojson",
+    "tile",
+    "slippy",
+    "map",
+    "bbox"
+  ],
+  "jest": {
+    "verbose": true
+  },
+  "testEnvironment": "node",
+  "standard": {
+    "env": "jest"
+  }
+}
