@@ -23,11 +23,4 @@ $ npm install --save slippy-grid
 <script src="https://unpkg.com/slippy-grid/slippy-grid.min.js"></script>
 ```
 
-## Quickstart
-
-```javascript
-const slippyGrid = require('slippy-grid')
-
-```
-
 ## API

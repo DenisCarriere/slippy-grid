@@ -2,7 +2,8 @@
   "name": "slippy-grid",
   "version": "0.1.0",
   "description": "Create slippy tile grid iterators from BBox or GeoJSON",
-  "main": "index.js",
+  "main": "slippy-grid.js",
+  "jsnext:main": "index.js",
   "types": "index.d.ts",
   "files": [
     "index.d.ts",
@@ -15,7 +16,7 @@
     "test": "npm run lint && jest --coverage",
     "lint": "standard",
     "docs": "documentation readme index.js --section=API",
-    "build": "browserify index.js -s mercator > slippy-grid.js && uglifyjs slippy-grid.js -c -m > slippy-grid.min.js"
+    "build": "browserify index.js -s slippyGrid > slippy-grid.js && uglifyjs slippy-grid.js -c -m > slippy-grid.min.js"
   },
   "author": "Denis Carriere <carriere.denis@gmail.com>",
   "license": "MIT",
