@@ -23,7 +23,7 @@
   "author": "Denis Carriere <carriere.denis@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "global-mercator": "^2.0.2",
+    "global-mercator": "^2.0.3",
     "leaflet": "^1.0.3"
   },
   "devDependencies": {
