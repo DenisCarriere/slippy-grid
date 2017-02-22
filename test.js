@@ -4,6 +4,7 @@ const load = require('load-json-file')
 const mercator = require('global-mercator')
 const write = require('write-json-file')
 const turf = require('@turf/turf')
+const normalize = require('geojson-normalize')
 const slippyGrid = require('.')
 
 const directories = {
@@ -33,25 +34,32 @@ describe('grid', () => {
 
   for (const fixture of fixtures) {
     const name = fixture.name
-    const geojson = fixture.geojson
+    const geojson = normalize(JSON.parse(JSON.stringify(fixture.geojson)))
+    const collection = turf.featureCollection([])
 
     test('single ' + name, () => {
-      const grid = slippyGrid.single(fixture.geojson, 1, 8)
-      const collection = turf.featureCollection([])
+      const grid = slippyGrid.single(JSON.parse(JSON.stringify(fixture.geojson)), 1, 8)
       while (true) {
         const {value, done} = grid.next()
         if (done) { break }
         const tile = value
-        const polygon = turf.bboxPolygon(mercator.tileToBBox(tile))
-        polygon.properties['fill-opacity'] = 0
+        const bbox = mercator.tileToBBox(tile)
+        const polygon = turf.bboxPolygon(bbox)
+        polygon.properties = {
+          'fill-opacity': 0,
+          x: tile[0],
+          y: tile[1],
+          z: tile[2],
+          bbox
+        }
         collection.features.push(polygon)
       }
-      if (geojson.type === 'FeatureCollection') {
-        geojson.features.map(feature => collection.features.push(feature))
-      }
-      if (geojson.type === 'Feature') {
-        collection.features.push(geojson)
-      }
+      geojson.features.map(feature => {
+        feature.properties['fill-opacity'] = 0.2
+        feature.properties['stroke'] = '#0000ff'
+        feature.properties['stroke-width'] = 3
+        collection.features.push(feature)
+      })
       if (process.env.REGEN) { write.sync(directories.out + name, collection) }
       expect(collection, load.sync(directories.out + name))
     })

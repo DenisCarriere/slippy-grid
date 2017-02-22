@@ -19,6 +19,7 @@ while (true) {
   count++
 }
 
+geojson.features.map(feature => collection.features.push(feature))
 write.sync(path.join(__dirname, 'results.geojson'), collection)
 console.log('count', count)
-console.log(slippyGrid.count(geojson, 1, 5))
+// console.log(slippyGrid.count(geojson, 1, 8))

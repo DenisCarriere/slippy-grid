@@ -1,9 +1,13 @@
 
 # Changelog
 
+## 1.2.0 - 2017-02-22
+
+- Support overlapping GeoJSON properties with multiple different zoom levels
+- Filter by minZoom & maxZoom via GeoJSON properties
+
 ## 1.1.0 - 2017-02-21
 
-- Added RBush to speed up performance by 75% for multiple GeoJSON calculations
 - Support Multiple GeoJSON Polygon
 - Added GeoJSON input support
 

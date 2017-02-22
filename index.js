@@ -1,6 +1,6 @@
 import * as mercator from 'global-mercator'
 import * as turf from './lib/turf'
-import rbush from './lib/rbush'
+import normalize from './lib/geojson-normalize'
 
 /**
  * Creates an Iterator of Tiles from a given BBox
@@ -17,18 +17,6 @@ import rbush from './lib/rbush'
  */
 export function * single (extent, minZoom, maxZoom) {
   const unique = {}
-  let geojson
-  const tree = rbush()
-  if (extent.type === 'Feature' || extent.type === 'FeatureCollection') {
-    if (extent.type === 'FeatureCollection') { geojson = turf.featureCollection(extent.features) }
-    if (extent.type === 'Feature') { geojson = turf.featureCollection([extent]) }
-    extent = turf.bbox(geojson)
-    for (const feature of geojson.features) {
-      const bbox = turf.bbox(feature)
-      tree.insert({minX: bbox[0], minY: bbox[1], maxX: bbox[2], maxY: bbox[3]})
-    }
-  }
-
   for (const [columns, rows, zoom] of levels(extent, minZoom, maxZoom)) {
     for (const row of rows) {
       for (const column of columns) {
@@ -40,28 +28,35 @@ export function * single (extent, minZoom, maxZoom) {
           unique[key] = true
 
           // Filter geospatially
-          if (geojson) {
+          if (extent.type === 'Feature' || extent.type === 'FeatureCollection') {
             let isInside = false
+            const geojson = normalize(extent)
             const bbox = mercator.tileToBBox(tile)
+            const polygon = turf.bboxPolygon(bbox)
+            const exploded = turf.explode(polygon)
 
-            // Quick search using Rbush - Used for performance boost
-            if (tree.collides({minX: bbox[0], minY: bbox[1], maxX: bbox[2], maxY: bbox[3]})) {
-              const polygon = turf.bboxPolygon(bbox)
-              const exploded = turf.explode(polygon)
-              for (const feature of geojson.features) {
-                if (isInside) { break }
-                for (const point of exploded.features) {
-                  if (turf.inside(point, feature)) {
-                    isInside = true
-                    break
-                  }
+            // Remove any GeoJSON that do not meet zoom level requirements
+            geojson.features = geojson.features.filter(feature => {
+              const featureMinZoom = feature.properties.minZoom || feature.properties.minzoom
+              const featureMaxZoom = feature.properties.maxZoom || feature.properties.maxzoom
+              if (zoom < featureMinZoom) { return false }
+              if (zoom > featureMaxZoom) { return false }
+              return true
+            })
+
+            for (const feature of geojson.features) {
+              if (isInside) { break }
+              for (const point of exploded.features) {
+                if (turf.inside(point, feature)) {
+                  isInside = true
+                  break
                 }
               }
-              if (isInside) { yield tile }
             }
-          } else {
-            yield tile
-          }
+            // Return tile if inside GeoJSON
+            if (isInside) { yield tile }
+          // Return tile if not GeoJSON
+          } else { yield tile }
         }
       }
     }
@@ -115,11 +110,26 @@ export function * bulk (extent, minZoom, maxZoom, size) {
  * //=levels
  */
 export function levels (extent, minZoom, maxZoom) {
+  const extents = []
+
+  // Single Array
+  if (extent.length === 4 && extent[0][0] === undefined) { extents.push({bbox: extent, minZoom, maxZoom}) }
+
+  // Multiple Array
+  if (extent.length && extent[0][0] !== undefined) { extent.map(inner => extents.push({bbox: inner, minZoom, maxZoom})) }
+
+  // GeoJSON
   if (extent.type === 'Feature' || extent.type === 'FeatureCollection') {
-    extent = turf.bbox(extent)
+    const geojson = normalize(extent)
+    geojson.features.map(feature => {
+      const bbox = turf.bbox(feature)
+      const featureMinZoom = feature.properties.minZoom || feature.properties.minzoom || minZoom
+      const featureMaxZoom = feature.properties.maxZoom || feature.properties.maxzoom || maxZoom
+      extents.push({bbox, minZoom: featureMinZoom, maxZoom: featureMaxZoom})
+    })
   }
   const levels = []
-  for (const bbox of (extent[0][0]) ? extent : [extent]) {
+  for (const {bbox, minZoom, maxZoom} of extents) {
     const [x1, y1, x2, y2] = bbox
     for (const zoom of mercator.range(minZoom, maxZoom + 1)) {
       const t1 = mercator.lngLatToTile([x1, y1], zoom)
