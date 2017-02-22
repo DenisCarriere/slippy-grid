@@ -61,7 +61,8 @@
   "standard": {
     "env": "jest",
     "ignore": [
-      "dist"
+      "dist",
+      "lib"
     ]
   }
 }

@@ -4,6 +4,7 @@ const turf = require('@turf/turf')
 const slippyGrid = require('./')
 
 const geojson = load.sync('./test/in/featureCollection.geojson')
+const multipleGeojson = load.sync('./test/in/multipleFeatureCollection.geojson')
 const minZoom = 0
 const maxZoom = 5
 const bbox = turf.bbox(geojson)
@@ -19,6 +20,13 @@ suite
   })
   .add('single geojson', () => {
     const iterable = slippyGrid.single(geojson, minZoom, maxZoom)
+    while (true) {
+      const {done} = iterable.next()
+      if (done) { break }
+    }
+  })
+  .add('single multipleGeojson', () => {
+    const iterable = slippyGrid.single(multipleGeojson, minZoom, maxZoom)
     while (true) {
       const {done} = iterable.next()
       if (done) { break }

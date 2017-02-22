@@ -1,9 +1,6 @@
-import {lngLatToTile, hash, range, tileToBBox} from 'global-mercator'
-import turfBBox from './turf/turf-bbox'
-import inside from './turf/turf-inside'
-import bboxPolygon from './turf/turf-bbox-polygon'
-import explode from './turf/turf-explode'
-import {featureCollection} from './turf/turf-helpers'
+import * as mercator from 'global-mercator'
+import * as turf from './lib/turf'
+import rbush from './lib/rbush'
 
 /**
  * Creates an Iterator of Tiles from a given BBox
@@ -21,38 +18,47 @@ import {featureCollection} from './turf/turf-helpers'
 export function * single (extent, minZoom, maxZoom) {
   const unique = {}
   let geojson
-  if (extent.type === 'Feature') {
-    geojson = featureCollection([extent])
-    extent = turfBBox(geojson)
+  const tree = rbush()
+  if (extent.type === 'Feature' || extent.type === 'FeatureCollection') {
+    if (extent.type === 'FeatureCollection') { geojson = turf.featureCollection(extent.features) }
+    if (extent.type === 'Feature') { geojson = turf.featureCollection([extent]) }
+    extent = turf.bbox(geojson)
+    for (const feature of geojson.features) {
+      const bbox = turf.bbox(feature)
+      tree.insert({minX: bbox[0], minY: bbox[1], maxX: bbox[2], maxY: bbox[3]})
+    }
   }
-  if (extent.type === 'FeatureCollection') {
-    geojson = featureCollection(extent.features)
-    extent = turfBBox(geojson)
-  }
+
   for (const [columns, rows, zoom] of levels(extent, minZoom, maxZoom)) {
     for (const row of rows) {
       for (const column of columns) {
         // Filter by Unique key
         const tile = [column, row, zoom]
-        const key = hash(tile)
+        const key = mercator.hash(tile)
 
         if (!unique[key]) {
           unique[key] = true
+
           // Filter geospatially
           if (geojson) {
             let isInside = false
-            const polygon = bboxPolygon(tileToBBox(tile))
-            const exploded = explode(polygon)
-            for (const feature of geojson.features) {
-              if (isInside) { break }
-              for (const point of exploded.features) {
-                if (inside(point, feature)) {
-                  isInside = true
-                  break
+            const bbox = mercator.tileToBBox(tile)
+
+            // Quick search using Rbush - Used for performance boost
+            if (tree.collides({minX: bbox[0], minY: bbox[1], maxX: bbox[2], maxY: bbox[3]})) {
+              const polygon = turf.bboxPolygon(bbox)
+              const exploded = turf.explode(polygon)
+              for (const feature of geojson.features) {
+                if (isInside) { break }
+                for (const point of exploded.features) {
+                  if (turf.inside(point, feature)) {
+                    isInside = true
+                    break
+                  }
                 }
               }
+              if (isInside) { yield tile }
             }
-            if (isInside) { yield tile }
           } else {
             yield tile
           }
@@ -110,20 +116,20 @@ export function * bulk (extent, minZoom, maxZoom, size) {
  */
 export function levels (extent, minZoom, maxZoom) {
   if (extent.type === 'Feature' || extent.type === 'FeatureCollection') {
-    extent = turfBBox(extent)
+    extent = turf.bbox(extent)
   }
   const levels = []
   for (const bbox of (extent[0][0]) ? extent : [extent]) {
     const [x1, y1, x2, y2] = bbox
-    for (const zoom of range(minZoom, maxZoom + 1)) {
-      const t1 = lngLatToTile([x1, y1], zoom)
-      const t2 = lngLatToTile([x2, y2], zoom)
+    for (const zoom of mercator.range(minZoom, maxZoom + 1)) {
+      const t1 = mercator.lngLatToTile([x1, y1], zoom)
+      const t2 = mercator.lngLatToTile([x2, y2], zoom)
       const minty = Math.min(t1[1], t2[1])
       const maxty = Math.max(t1[1], t2[1])
       const mintx = Math.min(t1[0], t2[0])
       const maxtx = Math.max(t1[0], t2[0])
-      const rows = range(minty, maxty + 1)
-      const columns = range(mintx, maxtx + 1)
+      const rows = mercator.range(minty, maxty + 1)
+      const columns = mercator.range(mintx, maxtx + 1)
       levels.push([columns, rows, zoom])
     }
   }
