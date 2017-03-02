@@ -14,12 +14,13 @@
     "lib"
   ],
   "scripts": {
-    "prepublish": "npm run test && npm run uglify",
-    "test": "npm run lint && npm run build && jest --coverage",
+    "prepublish": "npm run test",
+    "pretest": "npm run rollup",
+    "test": "npm run lint && jest --coverage",
     "lint": "standard",
     "bench": "node bench.js",
     "docs": "documentation readme index.js --section=API",
-    "build": "rollup -c rollup.config.js"
+    "rollup": "rollup -c rollup.config.js"
   },
   "author": "Denis Carriere <carriere.denis@gmail.com>",
   "license": "MIT",
