@@ -1,6 +1,6 @@
 {
   "name": "slippy-grid",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Create slippy tile grid iterators from BBox or GeoJSON",
   "main": "dist/slippy-grid.js",
   "browser": "dist/slippy-grid.browser.js",
