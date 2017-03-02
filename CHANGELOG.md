@@ -1,6 +1,11 @@
 
 # Changelog
 
+## 1.2.1 - 2017-03-02
+
+- Removed `fastCount` from Typescript definition
+- Lowered quick count to 1000
+
 ## 1.2.0 - 2017-02-22
 
 - Support overlapping GeoJSON properties with multiple different zoom levels

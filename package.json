@@ -1,6 +1,6 @@
 {
   "name": "slippy-grid",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Create slippy tile grid iterators from BBox or GeoJSON",
   "main": "dist/slippy-grid.js",
   "browser": "dist/slippy-grid.browser.js",
@@ -19,8 +19,7 @@
     "lint": "standard",
     "bench": "node bench.js",
     "docs": "documentation readme index.js --section=API",
-    "build": "rollup -c rollup.config.js",
-    "uglify": "uglifyjs dist/slippy-grid.browser.js -c -m -o dist/slippy-grid.browser.min.js"
+    "build": "rollup -c rollup.config.js"
   },
   "author": "Denis Carriere <carriere.denis@gmail.com>",
   "license": "MIT",
@@ -39,7 +38,6 @@
     "rollup-plugin-node-resolve": "^2.0.0",
     "standard": "^8.6.0",
     "typescript": "^2.1.6",
-    "uglify-js": "git://github.com/mishoo/UglifyJS2.git#harmony",
     "write-json-file": "^2.0.0"
   },
   "keywords": [

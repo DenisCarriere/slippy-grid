@@ -152,14 +152,14 @@ export function levels (extent, minZoom, maxZoom) {
  * @param {BBox|BBox[]|GeoJSON} extent BBox [west, south, east, north] order or GeoJSON Polygon
  * @param {number} minZoom Minimum Zoom
  * @param {number} maxZoom Maximum Zoom
- * @param {number} [quick=1000000] Enable quick count if greater than number
+ * @param {number} [quick=1000] Enable quick count if greater than number
  * @returns {number} Total tiles from BBox
  * @example
  * count([-180.0, -90.0, 180, 90], 3, 8)
  * //=563136
  */
 export function count (extent, minZoom, maxZoom, quick) {
-  quick = quick || 1000000
+  quick = quick || 1000
   let count = 0
 
   // Quick count

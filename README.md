@@ -20,7 +20,7 @@ $ npm install --save slippy-grid
 **web browser [ES6](https://kangax.github.io/compat-table/es6)**
 
 ```html
-<script src="https://unpkg.com/slippy-grid/slippy-grid.min.js"></script>
+<script src="https://unpkg.com/slippy-grid/slippy-grid.js"></script>
 ```
 
 ## API
