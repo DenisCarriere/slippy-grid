@@ -38,13 +38,13 @@ Creates an Iterator of Tiles from a given BBox
 **Examples**
 
 ```javascript
-const iterable = single([-180.0, -90.0, 180, 90], 3, 8)
-const {value, done} = iterable.next()
-//=value
-//=done
+const grid = slippyGrid.single([-180.0, -90.0, 180, 90], 3, 8)
+const {value, done} = grid.next()
+//=value [x, y, z]
+//=done true/false
 ```
 
-Returns **Iterator&lt;Tile>** Iterable Tiles from BBox
+Returns **Iterator&lt;Tile>** Iterable Grid of Tiles from extent
 
 ### bulk
 
@@ -60,13 +60,13 @@ Creates a bulk Iterator of Tiles from a given BBox
 **Examples**
 
 ```javascript
-const grid = bulk([-180.0, -90.0, 180, 90], 3, 8, 5000)
+const grid = slippyGrid.bulk([-180.0, -90.0, 180, 90], 3, 8, 5000)
 const {value, done} = grid.next()
-//=value
-//=done
+//=value Array<[x, y, z]>
+//=done true/false
 ```
 
-Returns **Iterator&lt;[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;Tile>>** Bulk iterable Tiles from BBox
+Returns **Iterator&lt;[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;Tile>>** Bulk Iterable Grid of Tiles from extent
 
 ### levels
 
@@ -81,7 +81,7 @@ Creates a grid level pattern of arrays
 **Examples**
 
 ```javascript
-const levels = levels([-180.0, -90.0, 180, 90], 3, 8)
+const levels = slippyGrid.levels([-180.0, -90.0, 180, 90], 3, 8)
 //=levels
 ```
 
@@ -96,13 +96,13 @@ Counts the total amount of tiles from a given BBox
 -   `extent` **(BBox | [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;BBox> | GeoJSON)** BBox [west, south, east, north] order or GeoJSON Polygon
 -   `minZoom` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** Minimum Zoom
 -   `maxZoom` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** Maximum Zoom
--   `quick` **\[[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)]** Enable quick count if greater than number (optional, default `1000000`)
+-   `quick` **\[[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)]** Enable quick count if greater than number (optional, default `1000`)
 
 **Examples**
 
 ```javascript
-count([-180.0, -90.0, 180, 90], 3, 8)
-//=563136
+const count = slippyGrid.count([-180.0, -90.0, 180, 90], 3, 8)
+//=count 563136
 ```
 
 Returns **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** Total tiles from BBox
@@ -646,3 +646,13 @@ var collection = turf.geometryCollection([pt, line]);
 ```
 
 Returns **Feature&lt;GeometryCollection>** a GeoJSON GeometryCollection Feature
+
+### index
+
+Normalize a GeoJSON feature into a FeatureCollection.
+
+**Parameters**
+
+-   `gj` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** geojson data
+
+Returns **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** normalized geojson data

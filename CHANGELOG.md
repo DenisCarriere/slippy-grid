@@ -1,6 +1,11 @@
 
 # Changelog
 
+## 1.3.0 - 2017-03-04
+
+- Improved documentation
+- Add test case for slippyGrid.levels() => World Zoom Level 1
+
 ## 1.2.1 - 2017-03-02
 
 - Removed `fastCount` from Typescript definition

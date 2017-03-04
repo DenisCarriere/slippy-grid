@@ -8,12 +8,12 @@ import normalize from './lib/geojson-normalize'
  * @param {BBox|BBox[]|GeoJSON} extent BBox [west, south, east, north] order or GeoJSON Polygon
  * @param {number} minZoom Minimum Zoom
  * @param {number} maxZoom Maximum Zoom
- * @returns {Iterator<Tile>} Iterable Tiles from BBox
+ * @returns {Iterator<Tile>} Iterable Grid of Tiles from extent
  * @example
- * const iterable = single([-180.0, -90.0, 180, 90], 3, 8)
- * const {value, done} = iterable.next()
- * //=value
- * //=done
+ * const grid = slippyGrid.single([-180.0, -90.0, 180, 90], 3, 8)
+ * const {value, done} = grid.next()
+ * //=value [x, y, z]
+ * //=done true/false
  */
 export function * single (extent, minZoom, maxZoom) {
   const unique = {}
@@ -70,12 +70,12 @@ export function * single (extent, minZoom, maxZoom) {
  * @param {number} minZoom Minimum Zoom
  * @param {number} maxZoom Maximum Zoom
  * @param {number} size Maximum size for bulk Tiles
- * @returns {Iterator<Tile[]>} Bulk iterable Tiles from BBox
+ * @returns {Iterator<Tile[]>} Bulk Iterable Grid of Tiles from extent
  * @example
- * const grid = bulk([-180.0, -90.0, 180, 90], 3, 8, 5000)
+ * const grid = slippyGrid.bulk([-180.0, -90.0, 180, 90], 3, 8, 5000)
  * const {value, done} = grid.next()
- * //=value
- * //=done
+ * //=value Array<[x, y, z]>
+ * //=done true/false
  */
 export function * bulk (extent, minZoom, maxZoom, size) {
   const iterable = single(extent, minZoom, maxZoom)
@@ -106,7 +106,7 @@ export function * bulk (extent, minZoom, maxZoom, size) {
  * @param {number} maxZoom Maximum Zoom
  * @returns {GridLevel[]} Grid Level
  * @example
- * const levels = levels([-180.0, -90.0, 180, 90], 3, 8)
+ * const levels = slippyGrid.levels([-180.0, -90.0, 180, 90], 3, 8)
  * //=levels
  */
 export function levels (extent, minZoom, maxZoom) {
@@ -155,8 +155,8 @@ export function levels (extent, minZoom, maxZoom) {
  * @param {number} [quick=1000] Enable quick count if greater than number
  * @returns {number} Total tiles from BBox
  * @example
- * count([-180.0, -90.0, 180, 90], 3, 8)
- * //=563136
+ * const count = slippyGrid.count([-180.0, -90.0, 180, 90], 3, 8)
+ * //=count 563136
  */
 export function count (extent, minZoom, maxZoom, quick) {
   quick = quick || 1000
