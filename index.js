@@ -1,4 +1,4 @@
-const mercator = require('global-mercator')
+import {hash, range, tileToBBox, lngLatToTile} from 'global-mercator'
 const bboxPolygon = require('@turf/bbox-polygon')
 const explode = require('@turf/explode')
 const inside = require('@turf/inside')
@@ -25,7 +25,7 @@ function * single (extent, minZoom, maxZoom) {
       for (const column of columns) {
         // Filter by Unique key
         const tile = [column, row, zoom]
-        const key = mercator.hash(tile)
+        const key = hash(tile)
 
         if (!unique[key]) {
           unique[key] = true
@@ -34,7 +34,7 @@ function * single (extent, minZoom, maxZoom) {
           if (extent.type === 'Feature' || extent.type === 'FeatureCollection') {
             let isInside = false
             const geojson = normalize(extent)
-            const bbox = mercator.tileToBBox(tile)
+            const bbox = tileToBBox(tile)
             const polygon = bboxPolygon(bbox)
             const exploded = explode(polygon)
 
@@ -134,15 +134,15 @@ function levels (extent, minZoom, maxZoom) {
   const levels = []
   for (const {bbox, minZoom, maxZoom} of extents) {
     const [x1, y1, x2, y2] = bbox
-    for (const zoom of mercator.range(minZoom, maxZoom + 1)) {
-      const t1 = mercator.lngLatToTile([x1, y1], zoom)
-      const t2 = mercator.lngLatToTile([x2, y2], zoom)
+    for (const zoom of range(minZoom, maxZoom + 1)) {
+      const t1 = lngLatToTile([x1, y1], zoom)
+      const t2 = lngLatToTile([x2, y2], zoom)
       const minty = Math.min(t1[1], t2[1])
       const maxty = Math.max(t1[1], t2[1])
       const mintx = Math.min(t1[0], t2[0])
       const maxtx = Math.max(t1[0], t2[0])
-      const rows = mercator.range(minty, maxty + 1)
-      const columns = mercator.range(mintx, maxtx + 1)
+      const rows = range(minty, maxty + 1)
+      const columns = range(mintx, maxtx + 1)
       levels.push([columns, rows, zoom])
     }
   }
