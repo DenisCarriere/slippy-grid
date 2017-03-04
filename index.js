@@ -1,9 +1,13 @@
-import {hash, range, tileToBBox, lngLatToTile} from 'global-mercator'
 const bboxPolygon = require('@turf/bbox-polygon')
 const explode = require('@turf/explode')
 const inside = require('@turf/inside')
 const turfBBox = require('@turf/bbox')
 const normalize = require('geojson-normalize')
+const mercator = require('global-mercator')
+const hash = mercator.hash
+const range = mercator.range
+const tileToBBox = mercator.tileToBBox
+const lngLatToTile = mercator.lngLatToTile
 
 /**
  * Creates an Iterator of Tiles from a given BBox

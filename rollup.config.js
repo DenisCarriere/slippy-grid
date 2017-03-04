@@ -6,7 +6,7 @@ import json from 'rollup-plugin-json'
 
 export default {
   entry: 'index.js',
-  dest: 'docs/slippy-grid.min.js',
+  dest: 'slippy-grid.js',
   format: 'iife',
   plugins: [
     json(),
