@@ -4,10 +4,10 @@ import builtins from 'rollup-plugin-node-builtins'
 import globals from 'rollup-plugin-node-globals'
 import json from 'rollup-plugin-json'
 
-export default {
+module.exports = {
   entry: 'index.js',
-  dest: 'slippy-grid.js',
-  format: 'iife',
+  dest: 'docs/slippy-grid.min.js',
+  format: 'umd',
   plugins: [
     json(),
     resolve(),

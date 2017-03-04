@@ -3,7 +3,7 @@
 
 ## 1.3.0 - 2017-03-04
 
-- Output browser bundle to docs
+- Output browser bundle to docs UMD
 - Change rollup config
 - Rebuild library to pure ES6
 - Improved documentation

@@ -15,7 +15,7 @@
     "lint": "standard",
     "bench": "node bench.js",
     "docs": "documentation readme index.js --section=API",
-    "rollup": "rollup -c rollup.config.js"
+    "rollup": "rollup -c docs/rollup.config.js"
   },
   "author": "Denis Carriere <carriere.denis@gmail.com>",
   "license": "MIT",
@@ -24,7 +24,7 @@
     "@turf/bbox-polygon": "^3.10.5",
     "@turf/explode": "^3.10.5",
     "@turf/inside": "^3.10.5",
-    "global-mercator": "^2.2.1"
+    "global-mercator": "^2.2.2"
   },
   "devDependencies": {
     "@turf/turf": "^3.11.2",
@@ -65,8 +65,7 @@
   "standard": {
     "env": "jest",
     "ignore": [
-      "dist",
-      "lib"
+      "docs"
     ]
   }
 }
