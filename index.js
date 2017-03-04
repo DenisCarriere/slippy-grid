@@ -1,6 +1,9 @@
-import * as mercator from 'global-mercator'
-import * as turf from './lib/turf'
-import normalize from './lib/geojson-normalize'
+const mercator = require('global-mercator')
+const bboxPolygon = require('@turf/bbox-polygon')
+const explode = require('@turf/explode')
+const inside = require('@turf/inside')
+const turfBBox = require('@turf/bbox')
+const normalize = require('geojson-normalize')
 
 /**
  * Creates an Iterator of Tiles from a given BBox
@@ -15,7 +18,7 @@ import normalize from './lib/geojson-normalize'
  * //=value [x, y, z]
  * //=done true/false
  */
-export function * single (extent, minZoom, maxZoom) {
+function * single (extent, minZoom, maxZoom) {
   const unique = {}
   for (const [columns, rows, zoom] of levels(extent, minZoom, maxZoom)) {
     for (const row of rows) {
@@ -32,8 +35,8 @@ export function * single (extent, minZoom, maxZoom) {
             let isInside = false
             const geojson = normalize(extent)
             const bbox = mercator.tileToBBox(tile)
-            const polygon = turf.bboxPolygon(bbox)
-            const exploded = turf.explode(polygon)
+            const polygon = bboxPolygon(bbox)
+            const exploded = explode(polygon)
 
             // Remove any GeoJSON that do not meet zoom level requirements
             geojson.features = geojson.features.filter(feature => {
@@ -47,7 +50,7 @@ export function * single (extent, minZoom, maxZoom) {
             for (const feature of geojson.features) {
               if (isInside) { break }
               for (const point of exploded.features) {
-                if (turf.inside(point, feature)) {
+                if (inside(point, feature)) {
                   isInside = true
                   break
                 }
@@ -77,7 +80,7 @@ export function * single (extent, minZoom, maxZoom) {
  * //=value Array<[x, y, z]>
  * //=done true/false
  */
-export function * bulk (extent, minZoom, maxZoom, size) {
+function * bulk (extent, minZoom, maxZoom, size) {
   const iterable = single(extent, minZoom, maxZoom)
   let container = []
   let i = 0
@@ -109,7 +112,7 @@ export function * bulk (extent, minZoom, maxZoom, size) {
  * const levels = slippyGrid.levels([-180.0, -90.0, 180, 90], 3, 8)
  * //=levels
  */
-export function levels (extent, minZoom, maxZoom) {
+function levels (extent, minZoom, maxZoom) {
   const extents = []
 
   // Single Array
@@ -122,7 +125,7 @@ export function levels (extent, minZoom, maxZoom) {
   if (extent.type === 'Feature' || extent.type === 'FeatureCollection') {
     const geojson = normalize(extent)
     geojson.features.map(feature => {
-      const bbox = turf.bbox(feature)
+      const bbox = turfBBox(feature)
       const featureMinZoom = feature.properties.minZoom || feature.properties.minzoom || minZoom
       const featureMaxZoom = feature.properties.maxZoom || feature.properties.maxzoom || maxZoom
       extents.push({bbox, minZoom: featureMinZoom, maxZoom: featureMaxZoom})
@@ -158,7 +161,7 @@ export function levels (extent, minZoom, maxZoom) {
  * const count = slippyGrid.count([-180.0, -90.0, 180, 90], 3, 8)
  * //=count 563136
  */
-export function count (extent, minZoom, maxZoom, quick) {
+function count (extent, minZoom, maxZoom, quick) {
   quick = quick || 1000
   let count = 0
 
@@ -178,3 +181,4 @@ export function count (extent, minZoom, maxZoom, quick) {
   }
   return count
 }
+module.exports = {single, bulk, levels, count}
