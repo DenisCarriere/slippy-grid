@@ -1,6 +1,6 @@
 {
   "name": "slippy-grid",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Create slippy tile grid iterators from BBox or GeoJSON",
   "main": "index.js",
   "types": "index.d.ts",

@@ -18,4 +18,4 @@ export declare type Extent = BBox | BBox[] | Polygon | Polygons | MultiPolygon |
 export declare function single(extent: Extent, minZoom: number, maxZoom: number): Iterator<Tile>;
 export declare function bulk(extent: Extent, minZoom: number, maxZoom: number, size: number): Iterator<Tile[]>;
 export declare function levels(extent: Extent, minZoom: number, maxZoom: number): Level[];
-export declare function count(extent: Extent, minZoom: number, maxZoom: number): number;
+export declare function count(extent: Extent, minZoom: number, maxZoom: number, quick?: number): number;
