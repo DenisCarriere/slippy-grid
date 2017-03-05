@@ -24,6 +24,7 @@
     "@turf/bbox-polygon": "^3.10.5",
     "@turf/explode": "^3.10.5",
     "@turf/inside": "^3.10.5",
+    "geojson-normalize": "0.0.1",
     "global-mercator": "^2.2.2"
   },
   "devDependencies": {
