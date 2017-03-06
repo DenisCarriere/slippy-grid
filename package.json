@@ -1,15 +1,15 @@
 {
   "name": "slippy-grid",
-  "version": "1.2.4",
+  "version": "1.2.6",
   "description": "Create slippy tile grid iterators from BBox or GeoJSON",
   "main": "index.js",
   "types": "index.d.ts",
   "files": [
     "index.d.ts",
-    "index.js"
+    "index.js",
+    "docs"
   ],
   "scripts": {
-    "prepublish": "npm run test && npm run rollup",
     "pretest": "npm run lint",
     "test": "jest --coverage",
     "lint": "standard",
@@ -25,7 +25,7 @@
     "@turf/explode": "^3.10.5",
     "@turf/inside": "^3.10.5",
     "geojson-normalize": "0.0.1",
-    "global-mercator": "^2.2.2"
+    "global-mercator": "^2.3.0"
   },
   "devDependencies": {
     "@turf/turf": "^3.11.2",
