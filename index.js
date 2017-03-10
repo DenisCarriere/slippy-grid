@@ -137,8 +137,10 @@ function levels (extent, minZoom, maxZoom) {
   }
   const levels = []
   for (const {bbox, minZoom, maxZoom} of extents) {
-    const [x1, y1, x2, y2] = bbox
+    let [x1, y1, x2, y2] = bbox
     for (const zoom of range(minZoom, maxZoom + 1)) {
+      if (y2 > 85) y2 = 85
+      if (y2 < -85) y2 = -85
       const t1 = lngLatToTile([x1, y1], zoom)
       const t2 = lngLatToTile([x2, y2], zoom)
       const minty = Math.min(t1[1], t2[1])

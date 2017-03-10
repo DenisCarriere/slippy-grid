@@ -91,7 +91,7 @@ describe('grid', () => {
     expect(value.length).toBe(32)
   })
 
-  test('count', () => expect(slippyGrid.count(WORLD, 3, 21)).toBe(37773648480704))
+  test('count', () => expect(slippyGrid.count(WORLD, 3, 21)).toBe(5854460328256))
   test('levels', () => expect(slippyGrid.levels(WORLD, 3, 21).length).toBe(19))
   test('levels.world.zoom1', () => expect(slippyGrid.levels(WORLD, 1, 1)).toEqual([[[0, 1], [0, 1], 1]]))
 })

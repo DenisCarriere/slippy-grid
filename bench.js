@@ -3,48 +3,24 @@ const load = require('load-json-file')
 const turf = require('@turf/turf')
 const slippyGrid = require('./')
 
-const geojson = load.sync('./test/in/featureCollection.geojson')
-const multipleGeojson = load.sync('./test/in/multipleFeatureCollection.geojson')
+const featureCollection = load.sync('./test/in/featureCollection.geojson')
+const polygon = load.sync('./test/in/polygon.geojson')
 const minZoom = 0
 const maxZoom = 5
-const bbox = turf.bbox(geojson)
+const bbox = turf.bbox(featureCollection)
 const bulk = 5
 const suite = new Benchmark.Suite('slippy-grid')
 suite
-  .add('single', () => {
-    const iterable = slippyGrid.single(bbox, minZoom, maxZoom)
-    while (true) {
-      const {done} = iterable.next()
-      if (done) { break }
-    }
-  })
-  .add('single geojson', () => {
-    const iterable = slippyGrid.single(geojson, minZoom, maxZoom)
-    while (true) {
-      const {done} = iterable.next()
-      if (done) { break }
-    }
-  })
-  .add('single multipleGeojson', () => {
-    const iterable = slippyGrid.single(multipleGeojson, minZoom, maxZoom)
-    while (true) {
-      const {done} = iterable.next()
-      if (done) { break }
-    }
-  })
-  .add('bulk', () => {
-    const iterable = slippyGrid.bulk(bbox, minZoom, maxZoom, bulk)
-    while (true) {
-      const {done} = iterable.next()
-      if (done) { break }
-    }
-  })
-  .add('levels', () => { slippyGrid.levels(bbox, minZoom, maxZoom) })
-  .add('quickCount', () => { slippyGrid.count(bbox, minZoom, maxZoom, true) })
-  .add('quickCount max 20', () => { slippyGrid.count(bbox, minZoom, 20, true) })
-  .add('count', () => { slippyGrid.count(bbox, minZoom, maxZoom) })
-  .add('count geojson', () => { slippyGrid.count(geojson, minZoom, maxZoom) })
-  .add('count max 20', () => { slippyGrid.count(bbox, minZoom, 20) })
-  .on('cycle', (event) => { console.log(String(event.target)) })
+  .add('single', () => slippyGrid.single(bbox, minZoom, maxZoom))
+  .add('single featureCollection', () => slippyGrid.single(featureCollection, minZoom, maxZoom))
+  .add('single polygon', () => slippyGrid.single(polygon, minZoom, maxZoom))
+  .add('bulk', () => slippyGrid.bulk(bbox, minZoom, maxZoom, bulk))
+  .add('levels', () => slippyGrid.levels(bbox, minZoom, maxZoom))
+  .add('quickCount', () => slippyGrid.count(bbox, minZoom, maxZoom, 1000))
+  .add('quickCount max 20', () => slippyGrid.count(bbox, minZoom, 20, 1000))
+  .add('count', () => slippyGrid.count(bbox, minZoom, maxZoom))
+  .add('count polygon max 5', () => slippyGrid.count(polygon, minZoom, maxZoom))
+  .add('count polygon max 20', () => slippyGrid.count(polygon, minZoom, 20))
+  .on('cycle', e => console.log(String(e.target)))
   .on('complete', () => {})
   .run()

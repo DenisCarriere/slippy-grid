@@ -1,6 +1,10 @@
 
 # Changelog
 
+## 1.4.0 - 2017-03-10
+
+- Fix `levels()` & `count()` not returning the correct results.
+
 ## 1.3.0 - 2017-03-04
 
 - Output browser bundle to docs UMD
