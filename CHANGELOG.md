@@ -1,6 +1,12 @@
 
 # Changelog
 
+## 2.0.0 - 2017-03-17
+
+- Add `all()` method to return all tiles in a simple `Array`
+- Support Fiji Extent & any extent that share +180 & -180 degrees
+- Dropped GeoJSON precise extent (only support BBox of a GeoJSON)
+
 ## 1.4.0 - 2017-03-10
 
 - Fix `levels()` & `count()` not returning the correct results.

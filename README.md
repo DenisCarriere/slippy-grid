@@ -46,6 +46,25 @@ const {value, done} = grid.next()
 
 Returns **Iterator&lt;Tile>** Iterable Grid of Tiles from extent
 
+### all
+
+All Tiles from a given BBox
+
+**Parameters**
+
+-   `extent` **(BBox | [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;BBox> | GeoJSON)** BBox [west, south, east, north] order or GeoJSON Polygon
+-   `minZoom` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** Minimum Zoom
+-   `maxZoom` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** Maximum Zoom
+
+**Examples**
+
+```javascript
+const tiles = slippyGrid.all([-180.0, -90.0, 180, 90], 3, 8)
+//=tiles
+```
+
+Returns **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;Tile>** Tiles from extent
+
 ### bulk
 
 Creates a bulk Iterator of Tiles from a given BBox

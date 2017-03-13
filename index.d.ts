@@ -15,6 +15,7 @@ export declare type Extent = BBox | BBox[] | Polygon | Polygons | MultiPolygon |
 /**
  * Methods
  */
+export declare function all(extent: Extent, minZoom: number, maxZoom: number): Tile[];
 export declare function single(extent: Extent, minZoom: number, maxZoom: number): Iterator<Tile>;
 export declare function bulk(extent: Extent, minZoom: number, maxZoom: number, size: number): Iterator<Tile[]>;
 export declare function levels(extent: Extent, minZoom: number, maxZoom: number): Level[];
