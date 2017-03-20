@@ -1,6 +1,3 @@
-// const bboxPolygon = require('@turf/bbox-polygon')
-// const explode = require('@turf/explode')
-// const inside = require('@turf/inside')
 const turfBBox = require('@turf/bbox')
 const {hash, range, lngLatToTile} = require('global-mercator')
 const {featureEach} = require('@turf/meta')

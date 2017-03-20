@@ -96,5 +96,7 @@ describe('slippy-grid', () => {
   test('fiji', () => {
     const tiles = slippyGrid.all(FIJI, 2, 2)
     expect(tiles).toEqual([[3, 1, 2], [0, 1, 2]])
+    const count = slippyGrid.count(FIJI, 0, 10)
+    expect(count).toEqual(486)
   })
 })
