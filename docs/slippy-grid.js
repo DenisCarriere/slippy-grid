@@ -702,6 +702,654 @@ var index$2 = function (geojson) {
     return bbox;
 };
 
+var each$1 = index$4.coordEach;
+
+/**
+ * Takes a set of features, calculates the bbox of all input features, and returns a bounding box.
+ *
+ * @name bbox
+ * @param {(Feature|FeatureCollection)} geojson input features
+ * @return {Array<number>} bbox extent in [minX, minY, maxX, maxY] order
+ * @example
+ * var pt1 = turf.point([114.175329, 22.2524])
+ * var pt2 = turf.point([114.170007, 22.267969])
+ * var pt3 = turf.point([114.200649, 22.274641])
+ * var pt4 = turf.point([114.200649, 22.274641])
+ * var pt5 = turf.point([114.186744, 22.265745])
+ * var features = turf.featureCollection([pt1, pt2, pt3, pt4, pt5])
+ *
+ * var bbox = turf.bbox(features);
+ *
+ * var bboxPolygon = turf.bboxPolygon(bbox);
+ *
+ * //=bbox
+ *
+ * //=bboxPolygon
+ */
+var index$10 = function (geojson) {
+    var bbox = [Infinity, Infinity, -Infinity, -Infinity];
+    each$1(geojson, function (coord) {
+        if (bbox[0] > coord[0]) bbox[0] = coord[0];
+        if (bbox[1] > coord[1]) bbox[1] = coord[1];
+        if (bbox[2] < coord[0]) bbox[2] = coord[0];
+        if (bbox[3] < coord[1]) bbox[3] = coord[1];
+    });
+    return bbox;
+};
+
+/**
+ * Wraps a GeoJSON {@link Geometry} in a GeoJSON {@link Feature}.
+ *
+ * @name feature
+ * @param {Geometry} geometry input geometry
+ * @param {Object} properties properties
+ * @returns {FeatureCollection} a FeatureCollection of input features
+ * @example
+ * var geometry = {
+ *      "type": "Point",
+ *      "coordinates": [
+ *        67.5,
+ *        32.84267363195431
+ *      ]
+ *    }
+ *
+ * var feature = turf.feature(geometry);
+ *
+ * //=feature
+ */
+function feature(geometry, properties) {
+    if (!geometry) throw new Error('No geometry passed');
+
+    return {
+        type: 'Feature',
+        properties: properties || {},
+        geometry: geometry
+    };
+}
+var feature_1 = feature;
+
+/**
+ * Takes coordinates and properties (optional) and returns a new {@link Point} feature.
+ *
+ * @name point
+ * @param {Array<number>} coordinates longitude, latitude position (each in decimal degrees)
+ * @param {Object=} properties an Object that is used as the {@link Feature}'s
+ * properties
+ * @returns {Feature<Point>} a Point feature
+ * @example
+ * var pt1 = turf.point([-75.343, 39.984]);
+ *
+ * //=pt1
+ */
+var point$1 = function (coordinates, properties) {
+    if (!coordinates) throw new Error('No coordinates passed');
+    if (coordinates.length === undefined) throw new Error('Coordinates must be an array');
+    if (coordinates.length < 2) throw new Error('Coordinates must be at least 2 numbers long');
+    if (typeof coordinates[0] !== 'number' || typeof coordinates[1] !== 'number') throw new Error('Coordinates must numbers');
+
+    return feature({
+        type: 'Point',
+        coordinates: coordinates
+    }, properties);
+};
+
+/**
+ * Takes an array of LinearRings and optionally an {@link Object} with properties and returns a {@link Polygon} feature.
+ *
+ * @name polygon
+ * @param {Array<Array<Array<number>>>} coordinates an array of LinearRings
+ * @param {Object=} properties a properties object
+ * @returns {Feature<Polygon>} a Polygon feature
+ * @throws {Error} throw an error if a LinearRing of the polygon has too few positions
+ * or if a LinearRing of the Polygon does not have matching Positions at the
+ * beginning & end.
+ * @example
+ * var polygon = turf.polygon([[
+ *  [-2.275543, 53.464547],
+ *  [-2.275543, 53.489271],
+ *  [-2.215118, 53.489271],
+ *  [-2.215118, 53.464547],
+ *  [-2.275543, 53.464547]
+ * ]], { name: 'poly1', population: 400});
+ *
+ * //=polygon
+ */
+var polygon = function (coordinates, properties) {
+    if (!coordinates) throw new Error('No coordinates passed');
+
+    for (var i = 0; i < coordinates.length; i++) {
+        var ring = coordinates[i];
+        if (ring.length < 4) {
+            throw new Error('Each LinearRing of a Polygon must have 4 or more Positions.');
+        }
+        for (var j = 0; j < ring[ring.length - 1].length; j++) {
+            if (ring[ring.length - 1][j] !== ring[0][j]) {
+                throw new Error('First and last Position are not equivalent.');
+            }
+        }
+    }
+
+    return feature({
+        type: 'Polygon',
+        coordinates: coordinates
+    }, properties);
+};
+
+/**
+ * Creates a {@link LineString} based on a
+ * coordinate array. Properties can be added optionally.
+ *
+ * @name lineString
+ * @param {Array<Array<number>>} coordinates an array of Positions
+ * @param {Object=} properties an Object of key-value pairs to add as properties
+ * @returns {Feature<LineString>} a LineString feature
+ * @throws {Error} if no coordinates are passed
+ * @example
+ * var linestring1 = turf.lineString([
+ *   [-21.964416, 64.148203],
+ *   [-21.956176, 64.141316],
+ *   [-21.93901, 64.135924],
+ *   [-21.927337, 64.136673]
+ * ]);
+ * var linestring2 = turf.lineString([
+ *   [-21.929054, 64.127985],
+ *   [-21.912918, 64.134726],
+ *   [-21.916007, 64.141016],
+ *   [-21.930084, 64.14446]
+ * ], {name: 'line 1', distance: 145});
+ *
+ * //=linestring1
+ *
+ * //=linestring2
+ */
+var lineString = function (coordinates, properties) {
+    if (!coordinates) throw new Error('No coordinates passed');
+
+    return feature({
+        type: 'LineString',
+        coordinates: coordinates
+    }, properties);
+};
+
+/**
+ * Takes one or more {@link Feature|Features} and creates a {@link FeatureCollection}.
+ *
+ * @name featureCollection
+ * @param {Feature[]} features input features
+ * @returns {FeatureCollection} a FeatureCollection of input features
+ * @example
+ * var features = [
+ *  turf.point([-75.343, 39.984], {name: 'Location A'}),
+ *  turf.point([-75.833, 39.284], {name: 'Location B'}),
+ *  turf.point([-75.534, 39.123], {name: 'Location C'})
+ * ];
+ *
+ * var fc = turf.featureCollection(features);
+ *
+ * //=fc
+ */
+var featureCollection = function (features) {
+    if (!features) throw new Error('No features passed');
+
+    return {
+        type: 'FeatureCollection',
+        features: features
+    };
+};
+
+/**
+ * Creates a {@link Feature<MultiLineString>} based on a
+ * coordinate array. Properties can be added optionally.
+ *
+ * @name multiLineString
+ * @param {Array<Array<Array<number>>>} coordinates an array of LineStrings
+ * @param {Object=} properties an Object of key-value pairs to add as properties
+ * @returns {Feature<MultiLineString>} a MultiLineString feature
+ * @throws {Error} if no coordinates are passed
+ * @example
+ * var multiLine = turf.multiLineString([[[0,0],[10,10]]]);
+ *
+ * //=multiLine
+ *
+ */
+var multiLineString = function (coordinates, properties) {
+    if (!coordinates) throw new Error('No coordinates passed');
+
+    return feature({
+        type: 'MultiLineString',
+        coordinates: coordinates
+    }, properties);
+};
+
+/**
+ * Creates a {@link Feature<MultiPoint>} based on a
+ * coordinate array. Properties can be added optionally.
+ *
+ * @name multiPoint
+ * @param {Array<Array<number>>} coordinates an array of Positions
+ * @param {Object=} properties an Object of key-value pairs to add as properties
+ * @returns {Feature<MultiPoint>} a MultiPoint feature
+ * @throws {Error} if no coordinates are passed
+ * @example
+ * var multiPt = turf.multiPoint([[0,0],[10,10]]);
+ *
+ * //=multiPt
+ *
+ */
+var multiPoint = function (coordinates, properties) {
+    if (!coordinates) throw new Error('No coordinates passed');
+
+    return feature({
+        type: 'MultiPoint',
+        coordinates: coordinates
+    }, properties);
+};
+
+
+/**
+ * Creates a {@link Feature<MultiPolygon>} based on a
+ * coordinate array. Properties can be added optionally.
+ *
+ * @name multiPolygon
+ * @param {Array<Array<Array<Array<number>>>>} coordinates an array of Polygons
+ * @param {Object=} properties an Object of key-value pairs to add as properties
+ * @returns {Feature<MultiPolygon>} a multipolygon feature
+ * @throws {Error} if no coordinates are passed
+ * @example
+ * var multiPoly = turf.multiPolygon([[[[0,0],[0,10],[10,10],[10,0],[0,0]]]]);
+ *
+ * //=multiPoly
+ *
+ */
+var multiPolygon = function (coordinates, properties) {
+    if (!coordinates) throw new Error('No coordinates passed');
+
+    return feature({
+        type: 'MultiPolygon',
+        coordinates: coordinates
+    }, properties);
+};
+
+/**
+ * Creates a {@link Feature<GeometryCollection>} based on a
+ * coordinate array. Properties can be added optionally.
+ *
+ * @name geometryCollection
+ * @param {Array<{Geometry}>} geometries an array of GeoJSON Geometries
+ * @param {Object=} properties an Object of key-value pairs to add as properties
+ * @returns {Feature<GeometryCollection>} a GeoJSON GeometryCollection Feature
+ * @example
+ * var pt = {
+ *     "type": "Point",
+ *       "coordinates": [100, 0]
+ *     };
+ * var line = {
+ *     "type": "LineString",
+ *     "coordinates": [ [101, 0], [102, 1] ]
+ *   };
+ * var collection = turf.geometryCollection([pt, line]);
+ *
+ * //=collection
+ */
+var geometryCollection = function (geometries, properties) {
+    if (!geometries) throw new Error('No geometries passed');
+
+    return feature({
+        type: 'GeometryCollection',
+        geometries: geometries
+    }, properties);
+};
+
+var factors = {
+    miles: 3960,
+    nauticalmiles: 3441.145,
+    degrees: 57.2957795,
+    radians: 1,
+    inches: 250905600,
+    yards: 6969600,
+    meters: 6373000,
+    metres: 6373000,
+    kilometers: 6373,
+    kilometres: 6373,
+    feet: 20908792.65
+};
+
+/*
+ * Convert a distance measurement from radians to a more friendly unit.
+ *
+ * @name radiansToDistance
+ * @param {number} distance in radians across the sphere
+ * @param {string} [units=kilometers] can be degrees, radians, miles, or kilometers
+ * inches, yards, metres, meters, kilometres, kilometers.
+ * @returns {number} distance
+ */
+var radiansToDistance = function (radians, units) {
+    var factor = factors[units || 'kilometers'];
+    if (factor === undefined) throw new Error('Invalid unit');
+
+    return radians * factor;
+};
+
+/*
+ * Convert a distance measurement from a real-world unit into radians
+ *
+ * @name distanceToRadians
+ * @param {number} distance in real units
+ * @param {string} [units=kilometers] can be degrees, radians, miles, or kilometers
+ * inches, yards, metres, meters, kilometres, kilometers.
+ * @returns {number} radians
+ */
+var distanceToRadians = function (distance, units) {
+    var factor = factors[units || 'kilometers'];
+    if (factor === undefined) throw new Error('Invalid unit');
+
+    return distance / factor;
+};
+
+/*
+ * Convert a distance measurement from a real-world unit into degrees
+ *
+ * @name distanceToRadians
+ * @param {number} distance in real units
+ * @param {string} [units=kilometers] can be degrees, radians, miles, or kilometers
+ * inches, yards, metres, meters, kilometres, kilometers.
+ * @returns {number} degrees
+ */
+var distanceToDegrees = function (distance, units) {
+    var factor = factors[units || 'kilometers'];
+    if (factor === undefined) throw new Error('Invalid unit');
+
+    return (distance / factor) * 57.2958;
+};
+
+var index$14 = {
+	feature: feature_1,
+	point: point$1,
+	polygon: polygon,
+	lineString: lineString,
+	featureCollection: featureCollection,
+	multiLineString: multiLineString,
+	multiPoint: multiPoint,
+	multiPolygon: multiPolygon,
+	geometryCollection: geometryCollection,
+	radiansToDistance: radiansToDistance,
+	distanceToRadians: distanceToRadians,
+	distanceToDegrees: distanceToDegrees
+};
+
+var bbox$1 = index$10;
+var point = index$14.point;
+
+/**
+ * Takes a {@link Feature} or {@link FeatureCollection} and returns the absolute center point of all features.
+ *
+ * @name center
+ * @param {(Feature|FeatureCollection)} layer input features
+ * @return {Feature<Point>} a Point feature at the absolute center point of all input features
+ * @example
+ * var features = {
+ *   "type": "FeatureCollection",
+ *   "features": [
+ *     {
+ *       "type": "Feature",
+ *       "properties": {},
+ *       "geometry": {
+ *         "type": "Point",
+ *         "coordinates": [-97.522259, 35.4691]
+ *       }
+ *     }, {
+ *       "type": "Feature",
+ *       "properties": {},
+ *       "geometry": {
+ *         "type": "Point",
+ *         "coordinates": [-97.502754, 35.463455]
+ *       }
+ *     }, {
+ *       "type": "Feature",
+ *       "properties": {},
+ *       "geometry": {
+ *         "type": "Point",
+ *         "coordinates": [-97.508269, 35.463245]
+ *       }
+ *     }, {
+ *       "type": "Feature",
+ *       "properties": {},
+ *       "geometry": {
+ *         "type": "Point",
+ *         "coordinates": [-97.516809, 35.465779]
+ *       }
+ *     }, {
+ *       "type": "Feature",
+ *       "properties": {},
+ *       "geometry": {
+ *         "type": "Point",
+ *         "coordinates": [-97.515372, 35.467072]
+ *       }
+ *     }, {
+ *       "type": "Feature",
+ *       "properties": {},
+ *       "geometry": {
+ *         "type": "Point",
+ *         "coordinates": [-97.509363, 35.463053]
+ *       }
+ *     }, {
+ *       "type": "Feature",
+ *       "properties": {},
+ *       "geometry": {
+ *         "type": "Point",
+ *         "coordinates": [-97.511123, 35.466601]
+ *       }
+ *     }, {
+ *       "type": "Feature",
+ *       "properties": {},
+ *       "geometry": {
+ *         "type": "Point",
+ *         "coordinates": [-97.518547, 35.469327]
+ *       }
+ *     }, {
+ *       "type": "Feature",
+ *       "properties": {},
+ *       "geometry": {
+ *         "type": "Point",
+ *         "coordinates": [-97.519706, 35.469659]
+ *       }
+ *     }, {
+ *       "type": "Feature",
+ *       "properties": {},
+ *       "geometry": {
+ *         "type": "Point",
+ *         "coordinates": [-97.517839, 35.466998]
+ *       }
+ *     }, {
+ *       "type": "Feature",
+ *       "properties": {},
+ *       "geometry": {
+ *         "type": "Point",
+ *         "coordinates": [-97.508678, 35.464942]
+ *       }
+ *     }, {
+ *       "type": "Feature",
+ *       "properties": {},
+ *       "geometry": {
+ *         "type": "Point",
+ *         "coordinates": [-97.514914, 35.463453]
+ *       }
+ *     }
+ *   ]
+ * };
+ *
+ * var centerPt = turf.center(features);
+ * centerPt.properties['marker-size'] = 'large';
+ * centerPt.properties['marker-color'] = '#000';
+ *
+ * var resultFeatures = features.features.concat(centerPt);
+ * var result = {
+ *   "type": "FeatureCollection",
+ *   "features": resultFeatures
+ * };
+ *
+ * //=result
+ */
+
+var index$12 = function (layer) {
+    var ext = bbox$1(layer);
+    var x = (ext[0] + ext[2]) / 2;
+    var y = (ext[1] + ext[3]) / 2;
+    return point([x, y]);
+};
+
+var turfBBox$1 = index$10;
+var turfCenter = index$12;
+
+/**
+ * Modifies a BBox to fit within the bounds of the International Date Line.
+ *
+ * @param {BBox|FeatureCollection|Feature<any>} bbox BBox [west, south, east, north] or GeoJSON Feature
+ * @returns {BBox} valid BBox extent
+ * @example
+ * dateline.bbox([190, 100, -200, -120])
+ * //= [-170, -80, 160, 60]
+ */
+function bbox (bbox) {
+  // input validation
+  if (!bbox) throw new Error('bbox is required')
+  if (!Array.isArray(bbox)) bbox = turfBBox$1(bbox);
+  if (bbox.length !== 4) throw new Error('bbox must have 4 numbers')
+
+  var west = bbox[0];
+  var south = bbox[1];
+  var east = bbox[2];
+  var north = bbox[3];
+
+  // Support bbox that overlaps the entire world
+  if (west < -180 && east > 180) {
+    west = -180;
+    east = 180;
+  }
+  if (east < -180 && west > 180) {
+    west = -180;
+    east = 180;
+  }
+  if (south < -90 && north > 90) {
+    south = -90;
+    north = 90;
+  }
+  if (north < -90 && south > 90) {
+    south = -90;
+    north = 90;
+  }
+  if (north > 90) north = 90;
+  if (south < -90) south = -90;
+
+  // Beyond 360 longitude degrees
+  if (Math.abs(bbox[0] - bbox[2]) > 360) {
+    west = -180;
+    east = 180;
+  }
+  // Beyond 180 latitude degrees
+  if (Math.abs(bbox[1] - bbox[3]) > 180) {
+    south = -90;
+    north = 90;
+  }
+  // Convert Lat & Lng within dateline
+  west = longitude$1(west);
+  south = latitude$1(south);
+  east = longitude$1(east);
+  north = latitude$1(north);
+
+  return [west, south, east, north]
+}
+
+/**
+ * Modifies a Center to fit within the bounds of the International Date Line.
+ *
+ * @param {[number, number]|BBox|FeatureCollection|Feature<any>} center Center [lng, lat], BBox [west, south, east, south] or GeoJSON Feature
+ * @returns {[number, number]} valid center coordinate
+ * @example
+ * dateline.center([190, 100])
+ * //= [-170, -80]
+ */
+function center (center) {
+  var coords;
+  if (!center) throw new Error('center is required')
+
+  // Support BBox [west, south, east, north]
+  if (Array.isArray(center)) {
+    if (center.length === 4) {
+      var bbox = center;
+      var west = bbox[0];
+      var south = bbox[1];
+      var east = bbox[2];
+      var north = bbox[3];
+      coords = [(west + east) / 2, (south + north) / 2];
+
+    // Support Center [lng, lat]
+    } else coords = [center[0], center[1]];
+
+  // Support any GeoJSON
+  } else coords = turfCenter(center).geometry.coordinates;
+
+  if (coords.length !== 2) throw new Error('center must have 2 numbers')
+  var lng = longitude$1(coords[0]);
+  var lat = latitude$1(coords[1]);
+
+  return [lng, lat]
+}
+
+/**
+ * Modifies a Latitude to fit within +/-90 degrees.
+ *
+ * @param {number} lat latitude to modify
+ * @returns {number} modified latitude
+ * @example
+ * dateline.latitude(100)
+ * //= -80
+ */
+function latitude$1 (lat) {
+  if (lat === undefined || lat === null) throw new Error('lat is required')
+
+  // Latitudes cannot extends beyond +/-90 degrees
+  if (lat > 90 || lat < -90) {
+    lat = lat % 180;
+    if (lat > 90) lat = -180 + lat;
+    if (lat < -90) lat = 180 + lat;
+    if (lat === -0) lat = 0;
+  }
+  return lat
+}
+
+/**
+ * Modifies a Longitude to fit within +/-180 degrees.
+ *
+ * @param {number} lng longitude to modify
+ * @returns {number} modified longitude
+ * @example
+ * dateline.longitude(190)
+ * //= -170
+ */
+function longitude$1 (lng) {
+  if (lng === undefined || lng === undefined) throw new Error('lng is required')
+
+  // lngitudes cannot extends beyond +/-90 degrees
+  if (lng > 180 || lng < -180) {
+    lng = lng % 360;
+    if (lng > 180) lng = -360 + lng;
+    if (lng < -180) lng = 360 + lng;
+    if (lng === -0) lng = 0;
+  }
+  return lng
+}
+
+var index$8 = {
+  bbox: bbox,
+  longitude: longitude$1,
+  latitude: latitude$1,
+  center: center
+};
+
+var latitude = index$8.latitude;
+var longitude = index$8.longitude;
+
 var originShift = 2 * Math.PI * 6378137 / 2.0;
 function initialResolution (tileSize) {
   tileSize = tileSize || 256;
@@ -1226,22 +1874,14 @@ function validateZoom (zoom) {
  * //= Error: LngLat [lng] must be within -180 to 180 degrees
  */
 function validateLngLat (lnglat, validate) {
-  var lng = lnglat[0];
-  var lat = lnglat[1];
-  if (validate === false) return [lng, lat]
-  if (lat === undefined || lat === null) throw new Error('<lat> is required')
-  if (lng === undefined || lng === null) throw new Error('<lng> is required')
+  if (validate === false) return lnglat
 
-  // Longitude extends beyond +/-180 degrees
-  if (lng > 180 || lng < 180) {
-    lng = lng % 360;
-    if (lng > 180) lng = -360 + lng;
-    if (lng < -180) lng = 360 + lng;
-    if (lng === -0) lng = 0;
-  }
-  // Latitude cannot be greater or lower than +/-85 degrees
-  if (lat < -85) lat = -85;
+  var lng = longitude(lnglat[0]);
+  var lat = latitude(lnglat[1]);
+
+  // Global Mercator does not support latitudes within 85 to 90 degrees
   if (lat > 85) lat = 85;
+  if (lat < -85) lat = -85;
   return [lng, lat]
 }
 
@@ -1326,32 +1966,32 @@ function maxBBox (array) {
 
 var index$6 = {
   hash: hash$1,
-  bboxToCenter,
-  lngLatToMeters,
-  metersToLngLat,
-  metersToPixels,
+  bboxToCenter: bboxToCenter,
+  lngLatToMeters: lngLatToMeters,
+  metersToLngLat: metersToLngLat,
+  metersToPixels: metersToPixels,
   lngLatToTile: lngLatToTile$1,
-  lngLatToGoogle,
-  metersToTile,
-  pixelsToMeters,
-  pixelsToTile,
-  tileToBBoxMeters,
-  tileToBBox,
-  googleToBBoxMeters,
-  googleToBBox,
-  tileToGoogle,
-  googleToTile,
-  googleToQuadkey,
-  tileToQuadkey,
-  quadkeyToTile,
-  quadkeyToGoogle,
-  bboxToMeters,
-  validateTile,
-  validateZoom,
-  validateLngLat,
-  resolution,
+  lngLatToGoogle: lngLatToGoogle,
+  metersToTile: metersToTile,
+  pixelsToMeters: pixelsToMeters,
+  pixelsToTile: pixelsToTile,
+  tileToBBoxMeters: tileToBBoxMeters,
+  tileToBBox: tileToBBox,
+  googleToBBoxMeters: googleToBBoxMeters,
+  googleToBBox: googleToBBox,
+  tileToGoogle: tileToGoogle,
+  googleToTile: googleToTile,
+  googleToQuadkey: googleToQuadkey,
+  tileToQuadkey: tileToQuadkey,
+  quadkeyToTile: quadkeyToTile,
+  quadkeyToGoogle: quadkeyToGoogle,
+  bboxToMeters: bboxToMeters,
+  validateTile: validateTile,
+  validateZoom: validateZoom,
+  validateLngLat: validateLngLat,
+  resolution: resolution,
   range: range$1,
-  maxBBox
+  maxBBox: maxBBox
 };
 
 const turfBBox = index$2;

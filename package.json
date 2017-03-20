@@ -1,6 +1,6 @@
 {
   "name": "slippy-grid",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "description": "Create slippy tile grid iterators from BBox or GeoJSON",
   "main": "index.js",
   "types": "index.d.ts",
@@ -24,7 +24,7 @@
   "dependencies": {
     "@turf/bbox": "^3.10.5",
     "@turf/meta": "^3.13.0",
-    "global-mercator": "^2.4.0"
+    "global-mercator": "^2.6.0"
   },
   "devDependencies": {
     "@turf/bbox-polygon": "^3.10.5",
