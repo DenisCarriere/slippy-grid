@@ -1354,9 +1354,6 @@ var index$6 = {
   maxBBox
 };
 
-// const bboxPolygon = require('@turf/bbox-polygon')
-// const explode = require('@turf/explode')
-// const inside = require('@turf/inside')
 const turfBBox = index$2;
 const {hash, range, lngLatToTile} = index$6;
 const {featureEach} = index$4;

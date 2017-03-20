@@ -1,6 +1,6 @@
 {
   "name": "slippy-grid",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Create slippy tile grid iterators from BBox or GeoJSON",
   "main": "index.js",
   "types": "index.d.ts",
@@ -10,13 +10,14 @@
     "docs"
   ],
   "scripts": {
-    "prepublish": "npm run rollup",
+    "prepublish": "npm run test && npm run build && npm run docs",
     "pretest": "npm run lint",
-    "test": "jest --coverage",
-    "lint": "standard",
+    "test": "jest test.js --coverage",
     "bench": "node bench.js",
-    "docs": "documentation readme index.js --section=API",
-    "rollup": "rollup -c docs/rollup.config.js"
+    "lint": "standard index.js",
+    "build": "npm run rollup",
+    "docs": "documentation readme index.js --shallow --section=API --markdown-toc",
+    "rollup": "rollup -c rollup.config.js"
   },
   "author": "Denis Carriere <carriere.denis@gmail.com>",
   "license": "MIT",
