@@ -1,6 +1,6 @@
 {
   "name": "slippy-grid",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Create slippy tile grid iterators from BBox or GeoJSON",
   "main": "index.js",
   "types": "index.d.ts",
@@ -12,7 +12,7 @@
   "scripts": {
     "prepublish": "npm run test && npm run build && npm run docs",
     "pretest": "npm run lint",
-    "test": "jest test.js --coverage",
+    "test": "node test.js",
     "bench": "node bench.js",
     "lint": "standard index.js",
     "build": "npm run rollup",
@@ -31,10 +31,8 @@
     "@turf/turf": "^3.11.2",
     "@types/geojson": "^1.0.0",
     "benchmark": "^2.1.3",
-    "coveralls": "^2.11.16",
     "documentation": "^4.0.0-beta.18",
     "geojson-normalize": "^0.0.1",
-    "jest-cli": "^18.1.0",
     "rollup": "^0.41.4",
     "rollup-plugin-commonjs": "^7.0.0",
     "rollup-plugin-json": "^2.1.0",
@@ -42,6 +40,7 @@
     "rollup-plugin-node-globals": "^1.1.0",
     "rollup-plugin-node-resolve": "^2.0.0",
     "standard": "^8.6.0",
+    "tape": "^4.6.3",
     "typescript": "^2.2.1",
     "write-json-file": "^2.0.0"
   },
@@ -58,15 +57,5 @@
     "slippy",
     "map",
     "bbox"
-  ],
-  "jest": {
-    "verbose": true
-  },
-  "testEnvironment": "node",
-  "standard": {
-    "env": "jest",
-    "ignore": [
-      "docs"
-    ]
-  }
+  ]
 }

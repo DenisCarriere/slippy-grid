@@ -1,5 +1,5 @@
 const turfBBox = require('@turf/bbox')
-const {hash, range, lngLatToTile} = require('global-mercator')
+const {range, lngLatToTile} = require('global-mercator')
 const {featureEach} = require('@turf/meta')
 
 /**
@@ -16,18 +16,11 @@ const {featureEach} = require('@turf/meta')
  * //=done true/false
  */
 function * single (extent, minZoom, maxZoom) {
-  const unique = {}
   for (const [columns, rows, zoom] of levels(extent, minZoom, maxZoom)) {
     for (const row of rows) {
       for (const column of columns) {
         const tile = [column, row, zoom]
-        const key = hash(tile)
-
-        // Only return unique key
-        if (!unique[key]) {
-          unique[key] = true
-          yield tile
-        }
+        yield tile
       }
     }
   }

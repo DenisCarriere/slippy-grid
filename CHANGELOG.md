@@ -1,6 +1,10 @@
 
 # Changelog
 
+## 2.1.0 - 2017-03-30
+
+- Drop unique tiles (caused memory leaks on 1.3M+)
+
 ## 2.0.0 - 2017-03-17
 
 - Add `all()` method to return all tiles in a simple `Array`

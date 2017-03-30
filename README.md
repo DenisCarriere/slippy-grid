@@ -1,7 +1,6 @@
 # Slippy Grid
 
 [![Build Status](https://travis-ci.org/DenisCarriere/slippy-grid.svg?branch=master)](https://travis-ci.org/DenisCarriere/slippy-grid)
-[![Coverage Status](https://coveralls.io/repos/github/DenisCarriere/slippy-grid/badge.svg?branch=master)](https://coveralls.io/github/DenisCarriere/slippy-grid?branch=master)
 [![npm version](https://badge.fury.io/js/slippy-grid.svg)](https://badge.fury.io/js/slippy-grid)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/DenisCarriere/slippy-grid/master/LICENSE)
 
