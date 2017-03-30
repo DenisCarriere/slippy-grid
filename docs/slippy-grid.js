@@ -1365,7 +1365,7 @@ function initialResolution (tileSize) {
  * var id = mercator.hash([312, 480, 4])
  * //=5728
  */
-function hash$1 (tile) {
+function hash (tile) {
   var x = tile[0];
   var y = tile[1];
   var z = tile[2];
@@ -1965,7 +1965,7 @@ function maxBBox (array) {
 }
 
 var index$6 = {
-  hash: hash$1,
+  hash: hash,
   bboxToCenter: bboxToCenter,
   lngLatToMeters: lngLatToMeters,
   metersToLngLat: metersToLngLat,
@@ -1995,7 +1995,7 @@ var index$6 = {
 };
 
 const turfBBox = index$2;
-const {hash, range, lngLatToTile} = index$6;
+const {range, lngLatToTile} = index$6;
 const {featureEach} = index$4;
 
 /**
@@ -2012,18 +2012,11 @@ const {featureEach} = index$4;
  * //=done true/false
  */
 function * single (extent, minZoom, maxZoom) {
-  const unique = {};
   for (const [columns, rows, zoom] of levels(extent, minZoom, maxZoom)) {
     for (const row of rows) {
       for (const column of columns) {
         const tile = [column, row, zoom];
-        const key = hash(tile);
-
-        // Only return unique key
-        if (!unique[key]) {
-          unique[key] = true;
-          yield tile;
-        }
+        yield tile;
       }
     }
   }
