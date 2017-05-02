@@ -1,7 +1,7 @@
 {
   "name": "slippy-grid",
   "version": "2.1.1",
-  "description": "Create slippy tile grid iterators from BBox or GeoJSON",
+  "description": "Generates an iterator of TMS tiles from BBox or GeoJSON",
   "main": "index.js",
   "types": "index.d.ts",
   "files": [
