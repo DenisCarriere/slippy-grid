@@ -1,6 +1,6 @@
 {
   "name": "slippy-grid",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "Generates an iterator of TMS tiles from BBox or GeoJSON",
   "repository": {
     "type": "git",
