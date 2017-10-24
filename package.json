@@ -2,6 +2,10 @@
   "name": "slippy-grid",
   "version": "2.2.0",
   "description": "Generates an iterator of TMS tiles from BBox or GeoJSON",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/DenisCarriere/slippy-grid.git"
+  },
   "main": "index.js",
   "types": "index.d.ts",
   "files": [
@@ -18,22 +22,22 @@
   "author": "Denis Carriere <carriere.denis@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "@mapbox/tile-cover": "^3.0.2",
-    "@turf/bbox": "5.x",
-    "@turf/helpers": "5.x",
-    "@turf/meta": "5.x",
-    "global-mercator": "^3.0.2"
+    "@mapbox/tile-cover": "*",
+    "@turf/bbox": "*",
+    "@turf/helpers": "*",
+    "@turf/meta": "*",
+    "global-mercator": "*"
   },
   "devDependencies": {
-    "@turf/bbox-polygon": "5.x",
-    "@types/geojson": "^1.0.0",
-    "benchmark": "^2.1.3",
-    "documentation": "^5.3.3",
-    "geojson-normalize": "^0.0.1",
-    "standard": "^10.0.3",
-    "tape": "^4.6.3",
-    "typescript": "^2.2.1",
-    "write-json-file": "^2.0.0"
+    "@turf/bbox-polygon": "*",
+    "@types/geojson": "*",
+    "benchmark": "*",
+    "documentation": "*",
+    "geojson-normalize": "*",
+    "standard": "*",
+    "tape": "*",
+    "typescript": "*",
+    "write-json-file": "*"
   },
   "keywords": [
     "gis",
