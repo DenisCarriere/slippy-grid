@@ -4,8 +4,9 @@ const path = require('path')
 const load = require('load-json-file')
 const mercator = require('global-mercator')
 const write = require('write-json-file')
-const turf = require('@turf/turf')
-const featureEach = require('@turf/meta').featureEach
+const { featureEach } = require('@turf/meta')
+const { featureCollection } = require('@turf/helpers')
+const bboxPolygon = require('@turf/bbox-polygon')
 const slippyGrid = require('.')
 
 const directories = {
@@ -23,23 +24,21 @@ for (const filename of fs.readdirSync(directories.in)) {
   fixtures.push(fixture)
 }
 
-fixtures = fixtures.filter(({name}) => name === 'exclude-spatially')
-
 const FIJI = load.sync(path.join(__dirname, 'test', 'in', 'fiji.geojson'))
 const WORLD = [-180.0, -90.0, 180, 90]
 
 test('slippy-grid', t => {
   for (const {geojson, filename, name} of fixtures) {
-    const results = turf.featureCollection([])
-    const grid = slippyGrid.single(geojson, 4, 6)
+    const results = featureCollection([])
+    const grid = slippyGrid.geojson(geojson, 4, 6)
     while (true) {
       const {value, done} = grid.next()
-      if (done) { break }
+      if (done) break
       const tile = value
       const bbox = mercator.tileToBBox(tile)
-      const polygon = turf.bboxPolygon(bbox)
+      const polygon = bboxPolygon(bbox)
       polygon.properties = {
-        'fill-opacity': 0,
+        'fill-opacity': 0.2,
         x: tile[0],
         y: tile[1],
         z: tile[2],
@@ -53,7 +52,7 @@ test('slippy-grid', t => {
       feature.properties['stroke-width'] = 3
       results.features.push(feature)
     })
-    if (process.env.REGEN) { write.sync(directories.out + filename, results) }
+    if (process.env.REGEN) write.sync(directories.out + filename, results)
     t.deepEqual(results, load.sync(directories.out + filename), name)
   }
   t.end()
@@ -107,5 +106,31 @@ test('fiji', t => {
   t.deepEqual(tiles, [[3, 1, 2], [0, 1, 2]])
   const count = slippyGrid.count(FIJI, 0, 10)
   t.equal(count, 486)
+  t.end()
+})
+
+test('geojson', t => {
+  const grid = slippyGrid.geojson(FIJI, 2, 10)
+  let count = 0
+  while (true) {
+    const {done} = grid.next()
+    if (done) break
+    count++
+  }
+  t.equal(count, 1370)
+  t.end()
+})
+
+test('getChildren', t => {
+  const parentTile = [0, 572, 10]
+  const maxZoom = 12
+  const grid = slippyGrid.getChildren(parentTile, maxZoom)
+  let count = 0
+  while (true) {
+    const {done} = grid.next()
+    if (done) break
+    count++
+  }
+  t.equal(count, 84)
   t.end()
 })

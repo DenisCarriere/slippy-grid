@@ -1,6 +1,10 @@
 
 # Changelog
 
+## 2.2.0 - 2017-10-23
+
+- Support GeoJSON maximum/optimal tile cover
+
 ## 2.1.0 - 2017-03-30
 
 - Drop unique tiles (caused memory leaks on 1.3M+)

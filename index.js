@@ -1,6 +1,8 @@
+const cover = require('@mapbox/tile-cover')
 const turfBBox = require('@turf/bbox')
-const {range, lngLatToTile} = require('global-mercator')
-const {featureEach} = require('@turf/meta')
+const tilebelt = require('@mapbox/tilebelt')
+const { featureEach } = require('@turf/meta')
+const { range, lngLatToTile, googleToTile } = require('global-mercator')
 
 /**
  * Creates an Iterator of Tiles from a given BBox
@@ -23,6 +25,55 @@ function * single (extent, minZoom, maxZoom) {
         yield tile
       }
     }
+  }
+}
+
+/**
+ * Creates an Iterator of Tiles from a given GeoJSON
+ *
+ * @param {FeatureCollection<Polygon|MultiPolygon>} extent GeoJSON Polygon(s)
+ * @param {number} minZoom Minimum Zoom
+ * @param {number} maxZoom Maximum Zoom
+ * @returns {Iterator<Tile>} Iterable Grid of Tiles from GeoJSON
+ * @example
+ * const grid = slippyGrid.geojson(poly, 3, 8)
+ * const {value, done} = grid.next()
+ * // value => [x, y, z]
+ * // done => true/false
+ */
+function * geojson (extent, minZoom, maxZoom) {
+  const features = (extent.type === 'FeatureCollection') ? extent.features : [extent]
+  for (const feature of features) {
+    const parentTiles = cover.tiles(feature.geometry, {
+      min_zoom: minZoom,
+      max_zoom: maxZoom
+    })
+    for (const parentTile of parentTiles) {
+      yield googleToTile(parentTile)
+      yield * getChildren(parentTile, maxZoom)
+    }
+  }
+}
+
+/**
+ * Creates an Iterator of children Tiles from a given parent tile
+ *
+ * @param {GeoJSON} parentTile Tile
+ * @param {number} maxZoom Maximum Zoom
+ * @returns {Iterator<Tile>} Iterable of Tiles
+ * @example
+ * const parentTile = [0, 572, 10]
+ * const maxZoom = 12
+ * const grid = slippyGrid.getChildren(parentTile, maxZoom)
+ * const {value, done} = grid.next()
+ * // value => [x, y, z]
+ * // done => true/false
+ */
+function * getChildren (parentTile, maxZoom) {
+  for (const tile of tilebelt.getChildren(parentTile)) {
+    const zoom = tile[2]
+    if (zoom <= maxZoom) yield * getChildren(tile, maxZoom)
+    yield googleToTile(tile)
   }
 }
 
@@ -187,4 +238,5 @@ function count (extent, minZoom, maxZoom, quick) {
   }
   return count
 }
-module.exports = {single, bulk, levels, count, all}
+
+module.exports = {single, bulk, levels, count, all, geojson, getChildren}
