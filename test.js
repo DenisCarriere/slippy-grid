@@ -103,9 +103,9 @@ test('levels', t => {
 
 test('fiji', t => {
   const tiles = slippyGrid.all(FIJI, 2, 2)
-  t.deepEqual(tiles, [[3, 1, 2], [0, 1, 2]])
+  t.deepEqual(tiles, [[ 3, 2, 2 ], [ 0, 1, 2 ]])
   const count = slippyGrid.count(FIJI, 0, 10)
-  t.equal(count, 486)
+  t.equal(count, 326)
   t.end()
 })
 
@@ -117,7 +117,7 @@ test('geojson', t => {
     if (done) break
     count++
   }
-  t.equal(count, 1370)
+  t.equal(count, 326)
   t.end()
 })
 
@@ -131,6 +131,6 @@ test('getChildren', t => {
     if (done) break
     count++
   }
-  t.equal(count, 84)
+  t.equal(count, 20)
   t.end()
 })

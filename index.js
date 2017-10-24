@@ -1,8 +1,16 @@
 const cover = require('@mapbox/tile-cover')
-const turfBBox = require('@turf/bbox')
 const tilebelt = require('@mapbox/tilebelt')
+const turfBBox = require('@turf/bbox')
 const { featureEach } = require('@turf/meta')
 const { range, lngLatToTile, googleToTile } = require('global-mercator')
+
+function wrapTile (tile) {
+  let [x, y, z] = tile
+  const z2 = Math.pow(2, z)
+  x = x % z2
+  if (x < 0) x = x + z2
+  return [x, y, z]
+}
 
 /**
  * Creates an Iterator of Tiles from a given BBox
@@ -18,13 +26,19 @@ const { range, lngLatToTile, googleToTile } = require('global-mercator')
  * //=done true/false
  */
 function * single (extent, minZoom, maxZoom) {
-  for (const [columns, rows, zoom] of levels(extent, minZoom, maxZoom)) {
-    for (const row of rows) {
-      for (const column of columns) {
-        const tile = [column, row, zoom]
-        yield tile
+  if (Array.isArray(extent)) {
+    for (const [columns, rows, zoom] of levels(extent, minZoom, maxZoom)) {
+      for (const row of rows) {
+        for (const column of columns) {
+          const tile = [column, row, zoom]
+          yield tile
+        }
       }
     }
+  } else if (extent.type) {
+    yield * geojson(extent, minZoom, maxZoom)
+  } else {
+    throw new Error('unknown extent')
   }
 }
 
@@ -49,7 +63,9 @@ function * geojson (extent, minZoom, maxZoom) {
       max_zoom: maxZoom
     })
     for (const parentTile of parentTiles) {
-      yield googleToTile(parentTile)
+      const zoom = parentTile[2]
+      if (zoom > maxZoom) continue
+      yield wrapTile(googleToTile(parentTile))
       yield * getChildren(parentTile, maxZoom)
     }
   }
@@ -72,8 +88,9 @@ function * geojson (extent, minZoom, maxZoom) {
 function * getChildren (parentTile, maxZoom) {
   for (const tile of tilebelt.getChildren(parentTile)) {
     const zoom = tile[2]
-    if (zoom <= maxZoom) yield * getChildren(tile, maxZoom)
-    yield googleToTile(tile)
+    if (zoom > maxZoom) continue
+    if (zoom < maxZoom) yield * getChildren(tile, maxZoom)
+    yield wrapTile(googleToTile(tile))
   }
 }
 
